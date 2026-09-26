@@ -1,830 +1,830 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IzerWorks TaskPanel</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- FontAwesome & Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
     <!-- FullCalendar & Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
-                    colors: {
-                        izer: {
-                            dark: '#0B1120',
-                            card: '#1E293B',
-                            accent: '#06b6d4', // Cyan
-                            accentHover: '#0891b2',
-                            text: '#f8fafc',
-                            muted: '#94a3b8'
-                        },
-                        urgent: { main: '#f43f5e', bg: 'rgba(244, 63, 94, 0.1)' },
-                        relaxed: { main: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
-                        done: { main: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' }
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: { sans: ['"Plus Jakarta Sans"', "sans-serif"] },
+            colors: {
+              izer: {
+                dark: "#0B1120",
+                card: "#1E293B",
+                accent: "#06b6d4",
+                accentHover: "#0891b2",
+                text: "#f8fafc",
+                muted: "#94a3b8",
+              },
+              urgent: { main: "#f43f5e", bg: "rgba(244, 63, 94, 0.1)" },
+              relaxed: { main: "#3b82f6", bg: "rgba(59, 130, 246, 0.1)" },
+              done: { main: "#10b981", bg: "rgba(16, 185, 129, 0.1)" },
+            },
+          },
+        },
+      };
     </script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0B1120; color: #f8fafc; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0B1120; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
-        
-        .task-card { cursor: grab; transition: all 0.2s ease; }
-        .task-card:active { cursor: grabbing; }
-        .task-card.dragging { opacity: 0.5; transform: scale(0.95); }
-        .kanban-column.drag-over { background-color: rgba(30, 41, 59, 0.9); border: 2px dashed #06b6d4; }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #0b1120;
+        color: #f8fafc;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0b1120;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
 
-        /* Custom Checkbox */
-        .custom-checkbox {
-            appearance: none; width: 1.5rem; height: 1.5rem; border: 2px solid #475569; rounded: 0.5rem; 
-            border-radius: 0.375rem; display: grid; place-content: center; cursor: pointer; transition: all 0.2s; background: transparent;
-        }
-        .custom-checkbox::before {
-            content: ""; width: 0.8rem; height: 0.8rem;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-            transform: scale(0); background-color: white; transition: 120ms transform ease-in-out;
-        }
-        .custom-checkbox:checked { background-color: #10b981; border-color: #10b981; }
-        .custom-checkbox:checked::before { transform: scale(1); }
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
 
-        /* FullCalendar Overrides for Dark Mode */
-        .fc-theme-standard td, .fc-theme-standard th { border-color: #334155 !important; }
-        .fc-col-header-cell-cushion, .fc-daygrid-day-number { color: #f8fafc !important; }
-        .fc .fc-button-primary { background-color: #06b6d4 !important; border-color: #06b6d4 !important; }
-        .fc .fc-button-primary:hover { background-color: #0891b2 !important; border-color: #0891b2 !important; }
+      .task-card {
+        cursor: grab;
+        transition: all 0.2s ease;
+      }
+      .task-card:active {
+        cursor: grabbing;
+      }
+      .task-card.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+      .kanban-column.drag-over {
+        background-color: rgba(30, 41, 59, 0.9);
+        border: 2px dashed #06b6d4;
+      }
+
+      .custom-checkbox {
+        appearance: none;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid #475569;
+        border-radius: 0.375rem;
+        display: grid;
+        place-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: transparent;
+      }
+      .custom-checkbox::before {
+        content: "";
+        width: 0.8rem;
+        height: 0.8rem;
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        transform: scale(0);
+        background-color: white;
+        transition: 120ms transform ease-in-out;
+      }
+      .custom-checkbox:checked {
+        background-color: #10b981;
+        border-color: #10b981;
+      }
+      .custom-checkbox:checked::before {
+        transform: scale(1);
+      }
+
+      .fc-theme-standard td,
+      .fc-theme-standard th {
+        border-color: #334155 !important;
+      }
+      .fc-col-header-cell-cushion,
+      .fc-daygrid-day-number {
+        color: #f8fafc !important;
+      }
+      .fc .fc-button-primary {
+        background-color: #06b6d4 !important;
+        border-color: #06b6d4 !important;
+      }
+      .fc .fc-button-primary:hover {
+        background-color: #0891b2 !important;
+        border-color: #0891b2 !important;
+      }
     </style>
-</head>
-<body class="h-screen flex overflow-hidden w-full relative antialiased selection:bg-izer-accent selection:text-white">
-
+  </head>
+  <body class="h-screen flex overflow-hidden w-full relative antialiased selection:bg-izer-accent selection:text-white">
     <!-- Authentication Overlay -->
     <div id="auth-screen" class="fixed inset-0 z-[100] bg-izer-dark flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-izer-accent to-blue-500"></div>
-            
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold tracking-tight text-white mb-2">izerworks<span class="text-izer-accent">.</span></h1>
-                <p class="text-izer-muted text-sm">Masuk untuk mengelola TaskPanel Anda</p>
-            </div>
+      <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-izer-accent to-blue-500"></div>
 
-            <!-- Error Message Box -->
-            <div id="auth-error" class="hidden mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm text-center"></div>
-
-            <form id="auth-form" class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-izer-muted mb-1.5">Email</label>
-                    <div class="relative">
-                        <i class="fa-regular fa-envelope absolute left-3.5 top-3 text-izer-muted"></i>
-                        <input type="email" id="auth-email" required class="w-full pl-10 pr-4 py-2.5 bg-izer-dark/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent focus:border-izer-accent outline-none text-white transition-all">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-izer-muted mb-1.5">Password</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-izer-muted"></i>
-                        <input type="password" id="auth-password" required class="w-full pl-10 pr-4 py-2.5 bg-izer-dark/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent focus:border-izer-accent outline-none text-white transition-all">
-                    </div>
-                </div>
-                
-                <button type="submit" id="auth-submit-btn" class="w-full py-3 bg-izer-accent hover:bg-izer-accentHover text-white font-semibold rounded-xl transition-colors shadow-[0_0_15px_rgba(6,182,212,0.4)] flex justify-center items-center gap-2">
-                    <span>Masuk / Daftar</span>
-                </button>
-            </form>
-            <p class="mt-6 text-center text-xs text-izer-muted">
-                Sistem akan otomatis mendaftarkan akun jika email belum terdaftar.
-            </p>
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold tracking-tight text-white mb-2">izerworks<span class="text-izer-accent">.</span></h1>
+          <p class="text-izer-muted text-sm">Masuk untuk mengelola TaskPanel Anda (Firebase)</p>
         </div>
+
+        <div id="auth-error" class="hidden mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm text-center"></div>
+
+        <form id="auth-form" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-izer-muted mb-1.5">Email</label>
+            <div class="relative">
+              <i class="fa-regular fa-envelope absolute left-3.5 top-3 text-izer-muted"></i>
+              <input
+                type="email"
+                id="auth-email"
+                required
+                class="w-full pl-10 pr-4 py-2.5 bg-izer-dark/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent focus:border-izer-accent outline-none text-white transition-all"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-izer-muted mb-1.5">Password</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3.5 top-3 text-izer-muted"></i>
+              <input
+                type="password"
+                id="auth-password"
+                required
+                class="w-full pl-10 pr-4 py-2.5 bg-izer-dark/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent focus:border-izer-accent outline-none text-white transition-all"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="auth-submit-btn"
+            class="w-full py-3 bg-izer-accent hover:bg-izer-accentHover text-white font-semibold rounded-xl transition-colors shadow-[0_0_15px_rgba(6,182,212,0.4)] flex justify-center items-center gap-2"
+          >
+            <span>Masuk / Daftar</span>
+          </button>
+        </form>
+        <p class="mt-6 text-center text-xs text-izer-muted">Sistem otomatis membuat akun jika email belum terdaftar.</p>
+      </div>
     </div>
 
     <!-- Mobile Overlay -->
     <div id="mobile-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden md:hidden transition-opacity duration-300" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 glass-panel border-r border-slate-800 flex flex-col h-full shadow-2xl md:shadow-none z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="h-20 flex items-center justify-between md:justify-center px-6 border-b border-slate-800 shrink-0">
-            <h1 class="text-xl font-bold tracking-tight text-white">izerworks<span class="text-izer-accent">.</span></h1>
-            <button onclick="toggleSidebar()" class="md:hidden text-izer-muted hover:text-white transition-colors">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
+    <aside
+      id="sidebar"
+      class="fixed md:static inset-y-0 left-0 w-64 glass-panel border-r border-slate-800 flex flex-col h-full shadow-2xl md:shadow-none z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out"
+    >
+      <div class="h-20 flex items-center justify-between md:justify-center px-6 border-b border-slate-800 shrink-0">
+        <h1 class="text-xl font-bold tracking-tight text-white">izerworks<span class="text-izer-accent">.</span></h1>
+        <button onclick="toggleSidebar()" class="md:hidden text-izer-muted hover:text-white transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+        <button onclick="switchView('board')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-izer-accent/10 text-izer-accent rounded-xl font-medium transition-all" data-target="board">
+          <i class="fa-solid fa-layer-group w-5"></i> Kanban Board
+        </button>
+        <button onclick="switchView('calendar')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-izer-muted hover:bg-slate-800 hover:text-white rounded-xl font-medium transition-all" data-target="calendar">
+          <i class="fa-regular fa-calendar-check w-5"></i> Kalender
+        </button>
+        <button onclick="switchView('analytics')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-izer-muted hover:bg-slate-800 hover:text-white rounded-xl font-medium transition-all" data-target="analytics">
+          <i class="fa-solid fa-chart-pie w-5"></i> Analitik
+        </button>
+      </nav>
+
+      <div class="p-4 border-t border-slate-800">
+        <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl mb-4">
+          <div class="w-8 h-8 rounded-full bg-izer-accent text-white flex items-center justify-center font-bold text-sm" id="user-avatar">?</div>
+          <div class="flex-1 overflow-hidden">
+            <p class="text-xs text-white truncate" id="user-email-display">Memuat...</p>
+            <p class="text-[10px] text-green-400" id="connection-status">Online</p>
+          </div>
         </div>
-        
-        <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto" id="main-nav">
-            <button onclick="switchView('board')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-izer-accent/10 text-izer-accent rounded-xl font-medium transition-all" data-target="board">
-                <i class="fa-solid fa-layer-group w-5"></i> Kanban Board
-            </button>
-            <button onclick="switchView('calendar')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-izer-muted hover:bg-slate-800 hover:text-white rounded-xl font-medium transition-all" data-target="calendar">
-                <i class="fa-regular fa-calendar-check w-5"></i> Kalender
-            </button>
-            <button onclick="switchView('analytics')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-izer-muted hover:bg-slate-800 hover:text-white rounded-xl font-medium transition-all" data-target="analytics">
-                <i class="fa-solid fa-chart-pie w-5"></i> Analitik
-            </button>
-        </nav>
-        
-        <div class="p-4 border-t border-slate-800">
-            <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl mb-4">
-                <div class="w-8 h-8 rounded-full bg-izer-accent text-white flex items-center justify-center font-bold text-sm" id="user-avatar">
-                    U
-                </div>
-                <div class="flex-1 overflow-hidden">
-                    <p class="text-xs text-white truncate" id="user-email-display">user@email.com</p>
-                    <p class="text-[10px] text-izer-muted">Online</p>
-                </div>
-            </div>
-            <button onclick="logout()" class="w-full py-2.5 flex items-center justify-center gap-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors border border-transparent hover:border-red-400/20">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
-            </button>
-        </div>
+        <button id="btn-logout" class="w-full py-2.5 flex items-center justify-center gap-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors border border-transparent hover:border-red-400/20">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+        </button>
+      </div>
     </aside>
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full overflow-hidden relative w-full bg-[#0B1120]">
-        
-        <!-- Header -->
-        <header class="h-20 glass-panel border-b border-slate-800 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 w-full">
-            <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="md:hidden text-izer-muted hover:text-white text-xl p-2 -ml-2 rounded-lg transition-colors">
-                    <i class="fa-solid fa-bars-staggered"></i>
-                </button>
-                <div>
-                    <h2 class="text-xl font-bold text-white hidden sm:block" id="header-title">Dashboard Tugas</h2>
-                    <p class="text-xs text-izer-muted hidden sm:block">Kelola produktivitas kampus Anda</p>
-                </div>
+      <!-- Header -->
+      <header class="h-20 glass-panel border-b border-slate-800 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10 w-full">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="md:hidden text-izer-muted hover:text-white text-xl p-2 -ml-2 rounded-lg transition-colors">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+          <div>
+            <h2 class="text-xl font-bold text-white hidden sm:block" id="header-title">Dashboard Tugas</h2>
+            <p class="text-xs text-izer-muted hidden sm:block">Kelola produktivitas kampus Anda</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 sm:gap-4">
+          <button
+            onclick="openModal()"
+            class="bg-izer-accent hover:bg-izer-accentHover text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] flex items-center gap-2 transform hover:scale-105"
+          >
+            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tugas Baru</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-8 relative">
+        <!-- VIEW: BOARD -->
+        <div id="view-board" class="view-section animate-fade-in block">
+          <!-- Stats -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+              <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-izer-accent text-xl"><i class="fa-solid fa-list-check"></i></div>
+              <div>
+                <p class="text-xs text-izer-muted font-medium mb-1">Total Tugas</p>
+                <p class="text-2xl font-bold text-white" id="stat-total">0</p>
+              </div>
             </div>
-            
-            <div class="flex items-center gap-3 sm:gap-4">
-                <button onclick="openModal()" class="bg-izer-accent hover:bg-izer-accentHover text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm font-semibold transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] flex items-center gap-2 transform hover:scale-105">
-                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tugas Baru</span>
-                </button>
+            <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-urgent-main">
+              <div class="w-12 h-12 rounded-xl bg-urgent-bg flex items-center justify-center text-urgent-main text-xl"><i class="fa-solid fa-fire"></i></div>
+              <div>
+                <p class="text-xs text-izer-muted font-medium mb-1">Mendesak</p>
+                <p class="text-2xl font-bold text-white" id="stat-urgent">0</p>
+              </div>
             </div>
-        </header>
+            <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-relaxed-main">
+              <div class="w-12 h-12 rounded-xl bg-relaxed-bg flex items-center justify-center text-relaxed-main text-xl"><i class="fa-solid fa-mug-hot"></i></div>
+              <div>
+                <p class="text-xs text-izer-muted font-medium mb-1">Santai</p>
+                <p class="text-2xl font-bold text-white" id="stat-relaxed">0</p>
+              </div>
+            </div>
+            <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-done-main">
+              <div class="w-12 h-12 rounded-xl bg-done-bg flex items-center justify-center text-done-main text-xl"><i class="fa-solid fa-check-double"></i></div>
+              <div>
+                <p class="text-xs text-izer-muted font-medium mb-1">Selesai</p>
+                <p class="text-2xl font-bold text-white" id="stat-done">0</p>
+              </div>
+            </div>
+          </div>
 
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-8 relative">
-            
-            <!-- VIEW: BOARD -->
-            <div id="view-board" class="view-section animate-fade-in block">
-                <!-- Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-izer-accent text-xl">
-                            <i class="fa-solid fa-list-check"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-izer-muted font-medium mb-1">Total Tugas</p>
-                            <p class="text-2xl font-bold text-white" id="stat-total">0</p>
-                        </div>
-                    </div>
-                    <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-urgent-main">
-                        <div class="w-12 h-12 rounded-xl bg-urgent-bg flex items-center justify-center text-urgent-main text-xl">
-                            <i class="fa-solid fa-fire"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-izer-muted font-medium mb-1">Mendesak</p>
-                            <p class="text-2xl font-bold text-white" id="stat-urgent">0</p>
-                        </div>
-                    </div>
-                    <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-relaxed-main">
-                        <div class="w-12 h-12 rounded-xl bg-relaxed-bg flex items-center justify-center text-relaxed-main text-xl">
-                            <i class="fa-solid fa-mug-hot"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-izer-muted font-medium mb-1">Santai</p>
-                            <p class="text-2xl font-bold text-white" id="stat-relaxed">0</p>
-                        </div>
-                    </div>
-                    <div class="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 border-b-2 border-b-done-main">
-                        <div class="w-12 h-12 rounded-xl bg-done-bg flex items-center justify-center text-done-main text-xl">
-                            <i class="fa-solid fa-check-double"></i>
-                        </div>
-                        <div>
-                            <p class="text-xs text-izer-muted font-medium mb-1">Selesai</p>
-                            <p class="text-2xl font-bold text-white" id="stat-done">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kanban Columns -->
-                <div class="flex flex-col lg:flex-row gap-6 min-h-[500px]">
-                    <!-- Column: Urgent -->
-                    <div class="flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-4 px-1">
-                            <h3 class="font-semibold text-white flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-urgent-main shadow-[0_0_8px_rgba(244,63,94,0.6)]"></span> Mendesak
-                            </h3>
-                            <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-urgent">0</span>
-                        </div>
-                        <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px]" data-status="urgent">
-                            <!-- Tasks -->
-                        </div>
-                    </div>
-
-                    <!-- Column: Relaxed -->
-                    <div class="flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-4 px-1">
-                            <h3 class="font-semibold text-white flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-relaxed-main shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span> Bisa Nanti
-                            </h3>
-                            <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-relaxed">0</span>
-                        </div>
-                        <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px]" data-status="relaxed">
-                            <!-- Tasks -->
-                        </div>
-                    </div>
-
-                    <!-- Column: Completed -->
-                    <div class="flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-4 px-1">
-                            <h3 class="font-semibold text-white flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-done-main shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span> Selesai
-                            </h3>
-                            <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-done">0</span>
-                        </div>
-                        <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px] opacity-75" data-status="completed">
-                            <!-- Tasks -->
-                        </div>
-                    </div>
-                </div>
+          <!-- Kanban Columns -->
+          <div class="flex flex-col lg:flex-row gap-6 min-h-[500px]">
+            <div class="flex-1 flex flex-col">
+              <div class="flex items-center justify-between mb-4 px-1">
+                <h3 class="font-semibold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-urgent-main shadow-[0_0_8px_rgba(244,63,94,0.6)]"></span> Mendesak</h3>
+                <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-urgent">0</span>
+              </div>
+              <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px]" data-status="urgent"></div>
             </div>
 
-            <!-- VIEW: CALENDAR -->
-            <div id="view-calendar" class="view-section hidden animate-fade-in h-full flex flex-col">
-                <div class="mb-4 flex items-center justify-between">
-                    <p class="text-izer-muted text-sm">Klik tanggal mana saja pada kalender untuk menambahkan tugas (Upload Sendiri).</p>
-                </div>
-                <div class="glass-panel rounded-2xl p-4 sm:p-6 flex-1 text-sm bg-white text-slate-800 overflow-hidden" style="min-height: 600px;">
-                    <!-- Calendar container -> requires white bg for FullCalendar default contrast, 
-                         or extensive CSS override. We use partial overrides but keep it light inside to ensure readability -->
-                    <div id="calendar-el" class="h-full"></div>
-                </div>
+            <div class="flex-1 flex flex-col">
+              <div class="flex items-center justify-between mb-4 px-1">
+                <h3 class="font-semibold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-relaxed-main shadow-[0_0_8px_rgba(59,130,246,0.6)]"></span> Bisa Nanti</h3>
+                <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-relaxed">0</span>
+              </div>
+              <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px]" data-status="relaxed"></div>
             </div>
 
-            <!-- VIEW: ANALYTICS -->
-            <div id="view-analytics" class="view-section hidden animate-fade-in h-full">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-                    <!-- Chart 1: Completion -->
-                    <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-                        <h3 class="text-lg font-semibold text-white mb-6 w-full text-left">Status Penyelesaian</h3>
-                        <div class="w-full max-w-[300px] aspect-square relative">
-                            <canvas id="chart-completion"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Chart 2: Priority Distribution -->
-                    <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-                        <h3 class="text-lg font-semibold text-white mb-6 w-full text-left">Distribusi Prioritas (Belum Selesai)</h3>
-                        <div class="w-full aspect-video relative">
-                            <canvas id="chart-priority"></canvas>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex-1 flex flex-col">
+              <div class="flex items-center justify-between mb-4 px-1">
+                <h3 class="font-semibold text-white flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-done-main shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span> Selesai</h3>
+                <span class="text-xs font-bold bg-slate-800 text-izer-muted px-2 py-1 rounded-md" id="count-done">0</span>
+              </div>
+              <div class="kanban-column flex-1 glass-panel rounded-2xl p-3 flex flex-col gap-3 min-h-[150px] opacity-75" data-status="completed"></div>
             </div>
+          </div>
+        </div>
 
-        </main>
+        <!-- VIEW: CALENDAR -->
+        <div id="view-calendar" class="view-section hidden animate-fade-in h-full flex flex-col">
+          <div class="mb-4 flex items-center justify-between">
+            <p class="text-izer-muted text-sm">Klik tanggal mana saja pada kalender untuk menambahkan tugas.</p>
+          </div>
+          <div class="glass-panel rounded-2xl p-4 sm:p-6 flex-1 text-sm bg-white text-slate-800 overflow-hidden" style="min-height: 600px">
+            <div id="calendar-el" class="h-full"></div>
+          </div>
+        </div>
+
+        <!-- VIEW: ANALYTICS -->
+        <div id="view-analytics" class="view-section hidden animate-fade-in h-full">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+              <h3 class="text-lg font-semibold text-white mb-6 w-full text-left">Status Penyelesaian</h3>
+              <div class="w-full max-w-[300px] aspect-square relative"><canvas id="chart-completion"></canvas></div>
+            </div>
+            <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+              <h3 class="text-lg font-semibold text-white mb-6 w-full text-left">Distribusi Prioritas (Belum Selesai)</h3>
+              <div class="w-full aspect-video relative"><canvas id="chart-priority"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <!-- Add Task Modal -->
     <div id="task-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-700" id="task-modal-content">
-            <div class="flex justify-between items-center p-5 border-b border-slate-700 bg-slate-800/50">
-                <h3 class="font-bold text-lg text-white">Buat Tugas Baru</h3>
-                <button onclick="closeModal()" class="text-izer-muted hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <form id="task-form" class="p-6 space-y-5 bg-izer-card">
-                <div>
-                    <label class="block text-sm font-medium text-izer-muted mb-1.5">Nama Tugas</label>
-                    <input type="text" id="input-title" required autocomplete="off"
-                           class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white transition-all placeholder-slate-500"
-                           placeholder="Contoh: Makalah Sistem Operasi...">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-izer-muted mb-1.5">Kategori / Mata Kuliah</label>
-                    <input type="text" id="input-subject" required autocomplete="off"
-                           class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white transition-all placeholder-slate-500"
-                           placeholder="Contoh: Ilmu Komputer">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-izer-muted mb-1.5">Prioritas</label>
-                        <select id="input-priority" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white appearance-none cursor-pointer">
-                            <option value="urgent">🔴 Mendesak</option>
-                            <option value="relaxed">🔵 Bisa Nanti</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-izer-muted mb-1.5">Deadline (Opsional)</label>
-                        <input type="date" id="input-date" 
-                               class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white cursor-pointer [color-scheme:dark]">
-                    </div>
-                </div>
-                <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-colors">Batal</button>
-                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-izer-accent hover:bg-izer-accentHover text-white font-medium transition-colors shadow-lg">Simpan Tugas</button>
-                </div>
-            </form>
+      <div class="glass-panel rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-700" id="task-modal-content">
+        <div class="flex justify-between items-center p-5 border-b border-slate-700 bg-slate-800/50">
+          <h3 class="font-bold text-lg text-white">Buat Tugas Baru</h3>
+          <button onclick="closeModal()" class="text-izer-muted hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
+        <form id="task-form" class="p-6 space-y-5 bg-izer-card">
+          <div>
+            <label class="block text-sm font-medium text-izer-muted mb-1.5">Nama Tugas</label>
+            <input
+              type="text"
+              id="input-title"
+              required
+              autocomplete="off"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white transition-all placeholder-slate-500"
+              placeholder="Contoh: Makalah Sistem Operasi..."
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-izer-muted mb-1.5">Kategori / Mata Kuliah</label>
+            <input
+              type="text"
+              id="input-subject"
+              required
+              autocomplete="off"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white transition-all placeholder-slate-500"
+              placeholder="Contoh: Ilmu Komputer"
+            />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-izer-muted mb-1.5">Prioritas</label>
+              <select id="input-priority" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white appearance-none cursor-pointer">
+                <option value="urgent">🔴 Mendesak</option>
+                <option value="relaxed">🔵 Bisa Nanti</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-izer-muted mb-1.5">Deadline</label>
+              <input type="date" id="input-date" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-izer-accent outline-none text-white cursor-pointer [color-scheme:dark]" />
+            </div>
+          </div>
+          <div class="pt-4 flex gap-3">
+            <button type="button" onclick="closeModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-colors">Batal</button>
+            <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-izer-accent hover:bg-izer-accentHover text-white font-medium transition-colors shadow-lg">Simpan Tugas</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl border border-slate-700 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
-        <i class="fa-solid fa-circle-info text-izer-accent"></i>
-        <span id="toast-message">Pesan disini</span>
+      <i class="fa-solid fa-circle-info text-izer-accent"></i><span id="toast-message">Pesan</span>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+      // Import Firebase v11 Modular SDK dari CDN
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup (Works with Github env variables or fallback for sandbox)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'izerworks-taskpanel';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Your default config here if exporting to Github
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+      // ==========================================
+      // Konfigurasi Firebase Aktif
+      // ==========================================
+      const firebaseConfig = {
+        apiKey: "AIzaSyCPWG39zMRRdnEETqkxbEnIpJlev244tnI",
+        authDomain: "task-izerworks.firebaseapp.com",
+        projectId: "task-izerworks",
+        storageBucket: "task-izerworks.firebasestorage.app",
+        messagingSenderId: "93397951426",
+        appId: "1:93397951426:web:5a1a83fbc079234b612c5b",
+        measurementId: "G-NGD8EEYK1C",
+      };
 
-        // Global State
-        let currentUserId = null;
-        let tasksRef = null;
-        let tasks = [];
-        let unsubscribeTasks = null;
-        
-        // Instances for libraries
-        let calendarInstance = null;
-        let chartCompletion = null;
-        let chartPriority = null;
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-        // DOM Elements
-        const authScreen = document.getElementById('auth-screen');
-        const authForm = document.getElementById('auth-form');
-        const authError = document.getElementById('auth-error');
-        
-        const modal = document.getElementById('task-modal');
-        const modalContent = document.getElementById('task-modal-content');
-        const form = document.getElementById('task-form');
-        const columns = document.querySelectorAll('.kanban-column');
-        
-        // UI Helpers
-        window.showToast = function(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+      // Global State
+      let currentUser = null;
+      let tasks = [];
+      let unsubscribeTasks = null;
+
+      let calendarInstance = null;
+      let chartCompletion = null;
+      let chartPriority = null;
+
+      // Elements
+      const authScreen = document.getElementById("auth-screen");
+      const authForm = document.getElementById("auth-form");
+      const authError = document.getElementById("auth-error");
+      const btnLogout = document.getElementById("btn-logout");
+
+      window.showToast = function (message) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toast-message").textContent = message;
+        toast.classList.remove("translate-y-20", "opacity-0");
+        setTimeout(() => toast.classList.add("translate-y-20", "opacity-0"), 3000);
+      };
+
+      // Pantau Status Login (Auth Listener)
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // Berhasil Login
+          currentUser = user;
+          authScreen.classList.add("hidden");
+
+          // Update UI Profil
+          const email = user.email || "Pengguna";
+          document.getElementById("user-email-display").textContent = email;
+          document.getElementById("user-avatar").textContent = email.charAt(0).toUpperCase();
+
+          // Mulai ambil data dari Firestore (Real-time)
+          listenToTasks(user.uid);
+        } else {
+          // Logout / Belum Login
+          currentUser = null;
+          authScreen.classList.remove("hidden");
+
+          // Matikan listener data agar tidak bocor memory
+          if (unsubscribeTasks) unsubscribeTasks();
+          tasks = [];
+          renderBoard();
         }
+      });
 
-        // Listen to Auth State
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Logged In
-                currentUserId = user.uid;
-                authScreen.classList.add('hidden');
-                
-                // Update UI Profile
-                document.getElementById('user-email-display').textContent = user.email || "Pengguna";
-                document.getElementById('user-avatar').textContent = (user.email ? user.email.charAt(0).toUpperCase() : 'U');
-                
-                // Setup Firestore Data Listener (Rule 1 compliance)
-                tasksRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'tasks');
-                listenToTasks();
-                
-            } else {
-                // Logged Out
-                currentUserId = null;
-                authScreen.classList.remove('hidden');
-                document.getElementById('auth-email').value = '';
-                document.getElementById('auth-password').value = '';
-                
-                if (unsubscribeTasks) {
-                    unsubscribeTasks();
-                    unsubscribeTasks = null;
-                }
-                tasks = [];
-                renderBoard();
-            }
-        });
+      // Handle Login/Daftar
+      authForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("auth-email").value;
+        const password = document.getElementById("auth-password").value;
+        const btn = document.getElementById("auth-submit-btn");
 
-        // Handle Login/Register Submit
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const btn = document.getElementById('auth-submit-btn');
-            
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...`;
-            btn.disabled = true;
-            authError.classList.add('hidden');
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...`;
+        btn.disabled = true;
+        authError.classList.add("hidden");
 
+        try {
+          // Coba masuk dulu
+          await signInWithEmailAndPassword(auth, email, password);
+          showToast("Berhasil masuk!");
+        } catch (error) {
+          // Jika error "User not found" (auth/user-not-found) atau sejenisnya, coba daftarkan
+          if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
             try {
-                // Try Login First
-                await signInWithEmailAndPassword(auth, email, password);
-                showToast('Berhasil masuk ke IzerWorks');
-            } catch (error) {
-                // If user not found, auto-register
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
-                    try {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                        showToast('Akun baru berhasil didaftarkan');
-                    } catch (regError) {
-                        authError.textContent = "Gagal mendaftar: " + regError.message;
-                        authError.classList.remove('hidden');
-                    }
-                } else {
-                    authError.textContent = "Gagal masuk: " + error.message;
-                    authError.classList.remove('hidden');
-                }
-            } finally {
-                btn.innerHTML = `<span>Masuk / Daftar</span>`;
-                btn.disabled = false;
+              await createUserWithEmailAndPassword(auth, email, password);
+              showToast("Akun baru berhasil dibuat & masuk!");
+            } catch (regError) {
+              authError.textContent = "Gagal: " + regError.message;
+              authError.classList.remove("hidden");
             }
-        });
-
-        window.logout = async function() {
-            await signOut(auth);
-            showToast('Anda telah keluar');
-            toggleSidebar(true); // close sidebar if mobile
+          } else {
+            authError.textContent = "Error: " + error.message;
+            authError.classList.remove("hidden");
+          }
+        } finally {
+          btn.innerHTML = `<span>Masuk / Daftar</span>`;
+          btn.disabled = false;
         }
+      });
 
-        window.switchView = function(viewName) {
-            // Hide all views
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            
-            // Remove active state from nav buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-izer-accent/10', 'text-izer-accent');
-                btn.classList.add('text-izer-muted');
+      btnLogout.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          showToast("Anda telah keluar");
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      // Real-time Firestore Listener
+      function listenToTasks(userId) {
+        // Ambil koleksi 'tasks' di mana 'userId' cocok dengan user login saat ini
+        const q = query(collection(db, "tasks"), where("userId", "==", userId));
+
+        // onSnapshot akan terpanggil otomatis tiap ada perubahan di database
+        unsubscribeTasks = onSnapshot(
+          q,
+          (snapshot) => {
+            tasks = [];
+            snapshot.forEach((doc) => {
+              tasks.push({ id: doc.id, ...doc.data() });
             });
-            
-            // Show selected view
-            document.getElementById(`view-${viewName}`).classList.remove('hidden', 'animate-fade-in');
-            // Trigger reflow for animation
-            void document.getElementById(`view-${viewName}`).offsetWidth; 
-            document.getElementById(`view-${viewName}`).classList.add('animate-fade-in');
-            
-            // Highlight active button
-            const activeBtn = document.querySelector(`.nav-btn[data-target="${viewName}"]`);
-            activeBtn.classList.remove('text-izer-muted');
-            activeBtn.classList.add('bg-izer-accent/10', 'text-izer-accent');
 
-            // Update Header Title
-            const titles = { board: 'Kanban Board', calendar: 'Kalender Tugas', analytics: 'Analitik Produktivitas' };
-            document.getElementById('header-title').textContent = titles[viewName];
+            // Urutkan berdasarkan waktu di memori (terbaru di bawah)
+            tasks.sort((a, b) => a.createdAt - b.createdAt);
 
-            // Render specific components
-            if (viewName === 'calendar') {
-                setTimeout(initCalendar, 100); // Wait for display block to finish so Calendar gets correct dimensions
-            }
-            if (viewName === 'analytics') {
-                renderCharts();
-            }
+            renderBoard();
+            if (!document.getElementById("view-calendar").classList.contains("hidden")) updateCalendarEvents();
+            if (!document.getElementById("view-analytics").classList.contains("hidden")) renderCharts();
+          },
+          (error) => {
+            console.error("Error fetching data: ", error);
+            showToast("Gagal menyinkronkan data");
+          },
+        );
+      }
 
-            // Close sidebar on mobile
-            if(window.innerWidth < 768) toggleSidebar();
+      const form = document.getElementById("task-form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const title = document.getElementById("input-title").value.trim();
+        const subject = document.getElementById("input-subject").value.trim();
+        const priority = document.getElementById("input-priority").value;
+        const deadline = document.getElementById("input-date").value || null;
+
+        closeModal();
+
+        try {
+          // Tambah data ke Firestore
+          await addDoc(collection(db, "tasks"), {
+            userId: currentUser.uid,
+            title: title,
+            subject: subject,
+            type: priority,
+            completed: false,
+            deadline: deadline,
+            createdAt: Date.now(),
+          });
+          showToast("Tugas ditambahkan");
+        } catch (error) {
+          console.error("Gagal menambah:", error);
+          showToast("Gagal menyimpan tugas");
         }
+      });
 
-        window.toggleSidebar = function(forceClose = false) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobile-overlay');
-            if(forceClose) {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
-            } else {
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
-            }
+      window.toggleComplete = async function (id) {
+        if (!currentUser) return;
+        const task = tasks.find((t) => t.id === id);
+        if (task) {
+          try {
+            await updateDoc(doc(db, "tasks", id), { completed: !task.completed });
+          } catch (err) {
+            console.error(err);
+          }
         }
+      };
 
-        window.openModal = function(presetDate = null) {
-            modal.classList.remove('hidden');
-            setTimeout(() => modalContent.classList.replace('scale-95', 'scale-100'), 10);
-            
-            if (presetDate) {
-                document.getElementById('input-date').value = presetDate;
-            }
-            document.getElementById('input-title').focus();
+      window.deleteTask = async function (id) {
+        if (!currentUser) return;
+        try {
+          await deleteDoc(doc(db, "tasks", id));
+          showToast("Tugas dihapus");
+        } catch (err) {
+          console.error(err);
         }
+      };
 
-        window.closeModal = function() {
-            modalContent.classList.replace('scale-100', 'scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                form.reset();
-            }, 200); // match transition duration
+      window.togglePriority = async function (id) {
+        if (!currentUser) return;
+        const task = tasks.find((t) => t.id === id);
+        if (task && !task.completed) {
+          const newType = task.type === "urgent" ? "relaxed" : "urgent";
+          try {
+            await updateDoc(doc(db, "tasks", id), { type: newType });
+          } catch (err) {
+            console.error(err);
+          }
         }
+      };
 
-        function listenToTasks() {
-            unsubscribeTasks = onSnapshot(tasksRef, (snapshot) => {
-                tasks = [];
-                snapshot.forEach((doc) => {
-                    tasks.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Re-render currently active view
-                renderBoard();
-                if(!document.getElementById('view-calendar').classList.contains('hidden')) updateCalendarEvents();
-                if(!document.getElementById('view-analytics').classList.contains('hidden')) renderCharts();
-            }, (error) => {
-                console.error("Firestore Error:", error);
-                showToast("Gagal memuat data dari awan", "error");
-            });
+      window.updateTaskStatus = async function (id, newStatusColumn) {
+        if (!currentUser) return;
+        const task = tasks.find((t) => t.id === id);
+        if (!task) return;
+
+        let updates = {};
+        if (newStatusColumn === "completed") updates = { completed: true };
+        else if (newStatusColumn === "urgent") updates = { completed: false, type: "urgent" };
+        else if (newStatusColumn === "relaxed") updates = { completed: false, type: "relaxed" };
+
+        try {
+          await updateDoc(doc(db, "tasks", id), updates);
+        } catch (err) {
+          console.error(err);
         }
+      };
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUserId) return;
-
-            const title = document.getElementById('input-title').value.trim();
-            const subject = document.getElementById('input-subject').value.trim();
-            const priority = document.getElementById('input-priority').value;
-            const deadline = document.getElementById('input-date').value;
-
-            if (title && subject) {
-                const newTaskId = Date.now().toString();
-                const taskData = { title, subject, type: priority, completed: false, deadline };
-                
-                closeModal(); 
-                await setDoc(doc(tasksRef, newTaskId), taskData);
-                showToast('Tugas ditambahkan');
-            }
+      // UI Helpers
+      window.switchView = function (viewName) {
+        document.querySelectorAll(".view-section").forEach((el) => el.classList.add("hidden"));
+        document.querySelectorAll(".nav-btn").forEach((btn) => {
+          btn.classList.remove("bg-izer-accent/10", "text-izer-accent");
+          btn.classList.add("text-izer-muted");
         });
+        document.getElementById(`view-${viewName}`).classList.remove("hidden", "animate-fade-in");
+        void document.getElementById(`view-${viewName}`).offsetWidth;
+        document.getElementById(`view-${viewName}`).classList.add("animate-fade-in");
 
-        window.toggleComplete = async function(id) {
-            if (!currentUserId) return;
-            const task = tasks.find(t => t.id === id.toString());
-            if(task) await updateDoc(doc(tasksRef, id.toString()), { completed: !task.completed });
+        const activeBtn = document.querySelector(`.nav-btn[data-target="${viewName}"]`);
+        activeBtn.classList.remove("text-muted");
+        activeBtn.classList.add("bg-izer-accent/10", "text-izer-accent");
+
+        const titles = { board: "Kanban Board", calendar: "Kalender Tugas", analytics: "Analitik Produktivitas" };
+        document.getElementById("header-title").textContent = titles[viewName];
+
+        if (viewName === "calendar") setTimeout(initCalendar, 100);
+        if (viewName === "analytics") renderCharts();
+        if (window.innerWidth < 768) toggleSidebar(true);
+      };
+
+      window.toggleSidebar = function (forceClose = false) {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("mobile-overlay");
+        if (forceClose) {
+          sidebar.classList.add("-translate-x-full");
+          overlay.classList.add("hidden");
+        } else {
+          sidebar.classList.toggle("-translate-x-full");
+          overlay.classList.toggle("hidden");
         }
+      };
 
-        window.deleteTask = async function(id) {
-            if (!currentUserId) return;
-            await deleteDoc(doc(tasksRef, id.toString()));
-            showToast('Tugas dihapus');
-        }
+      const modal = document.getElementById("task-modal");
+      const modalContent = document.getElementById("task-modal-content");
 
-        window.togglePriority = async function(id) {
-            if (!currentUserId) return;
-            const task = tasks.find(t => t.id === id.toString());
-            if (task && !task.completed) {
-                const newType = task.type === 'urgent' ? 'relaxed' : 'urgent';
-                await updateDoc(doc(tasksRef, id.toString()), { type: newType });
-            }
-        }
+      window.openModal = function (presetDate = null) {
+        modal.classList.remove("hidden");
+        setTimeout(() => modalContent.classList.replace("scale-95", "scale-100"), 10);
+        if (presetDate) document.getElementById("input-date").value = presetDate;
+        document.getElementById("input-title").focus();
+      };
 
-        window.updateTaskStatus = async function(id, newStatusColumn) {
-            if (!currentUserId) return;
-            const task = tasks.find(t => t.id === id.toString());
-            if (!task) return;
+      window.closeModal = function () {
+        modalContent.classList.replace("scale-100", "scale-95");
+        setTimeout(() => {
+          modal.classList.add("hidden");
+          form.reset();
+        }, 200);
+      };
 
-            let updates = {};
-            if (newStatusColumn === 'completed') updates = { completed: true };
-            else if (newStatusColumn === 'urgent') updates = { completed: false, type: 'urgent' };
-            else if (newStatusColumn === 'relaxed') updates = { completed: false, type: 'relaxed' };
-            
-            await updateDoc(doc(tasksRef, id.toString()), updates);
-        }
+      function renderBoard() {
+        const columns = document.querySelectorAll(".kanban-column");
+        columns.forEach((col) => (col.innerHTML = ""));
+        let counts = { urgent: 0, relaxed: 0, completed: 0, total: tasks.length };
 
-        function renderBoard() {
-            columns.forEach(col => col.innerHTML = '');
-            let counts = { urgent: 0, relaxed: 0, completed: 0, total: tasks.length };
+        tasks.forEach((task) => {
+          let targetColSelector = "";
+          if (task.completed) {
+            targetColSelector = '[data-status="completed"]';
+            counts.completed++;
+          } else if (task.type === "urgent") {
+            targetColSelector = '[data-status="urgent"]';
+            counts.urgent++;
+          } else {
+            targetColSelector = '[data-status="relaxed"]';
+            counts.relaxed++;
+          }
 
-            tasks.forEach(task => {
-                let targetColSelector = '';
-                if (task.completed) { targetColSelector = '[data-status="completed"]'; counts.completed++; }
-                else if (task.type === 'urgent') { targetColSelector = '[data-status="urgent"]'; counts.urgent++; }
-                else { targetColSelector = '[data-status="relaxed"]'; counts.relaxed++; }
+          const columnEl = document.querySelector(targetColSelector);
+          const isDone = task.completed;
 
-                const columnEl = document.querySelector(targetColSelector);
-                const isDone = task.completed;
-                
-                const typeStyles = {
-                    urgent: { badge: 'bg-urgent-bg text-urgent-main border-urgent-main/20', border: 'border-l-urgent-main' },
-                    relaxed: { badge: 'bg-relaxed-bg text-relaxed-main border-relaxed-main/20', border: 'border-l-relaxed-main' },
-                    completed: { badge: 'bg-slate-800 text-izer-muted border-slate-700', border: 'border-l-done-main bg-slate-800/50' }
-                };
-                
-                const style = isDone ? typeStyles.completed : typeStyles[task.type];
-                
-                let dateHtml = '';
-                if (task.deadline) {
-                    const d = new Date(task.deadline);
-                    const formattedDate = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                    // Highlight if overdue and not done
-                    const isOverdue = !isDone && (new Date(task.deadline).getTime() < new Date().setHours(0,0,0,0));
-                    dateHtml = `<span class="text-xs ${isOverdue ? 'text-red-400 font-bold' : 'text-izer-muted'} flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> ${formattedDate}</span>`;
-                }
+          const typeStyles = {
+            urgent: { badge: "bg-urgent-bg text-urgent-main border-urgent-main/20", border: "border-l-urgent-main" },
+            relaxed: { badge: "bg-relaxed-bg text-relaxed-main border-relaxed-main/20", border: "border-l-relaxed-main" },
+            completed: { badge: "bg-slate-800 text-izer-muted border-slate-700", border: "border-l-done-main bg-slate-800/50" },
+          };
 
-                const card = document.createElement('div');
-                card.className = `task-card bg-izer-card border border-slate-700 border-l-[3px] ${style.border} rounded-xl p-4 shadow-lg hover:shadow-xl flex flex-col gap-3 group`;
-                card.draggable = true;
-                card.dataset.id = task.id;
+          const style = isDone ? typeStyles.completed : typeStyles[task.type];
 
-                card.innerHTML = `
+          let dateHtml = "";
+          if (task.deadline) {
+            const d = new Date(task.deadline);
+            const formattedDate = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+            const isOverdue = !isDone && new Date(task.deadline).getTime() < new Date().setHours(0, 0, 0, 0);
+            dateHtml = `<span class="text-xs ${isOverdue ? "text-red-400 font-bold" : "text-izer-muted"} flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> ${formattedDate}</span>`;
+          }
+
+          const card = document.createElement("div");
+          card.className = `task-card bg-izer-card border border-slate-700 border-l-[3px] ${style.border} rounded-xl p-4 shadow-lg hover:shadow-xl flex flex-col gap-3 group`;
+          card.draggable = true;
+          card.dataset.id = task.id;
+
+          card.innerHTML = `
                     <div class="flex justify-between items-start">
-                        <button onclick="${isDone ? '' : `togglePriority('${task.id}')`}" 
-                                class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${style.badge} transition-all ${isDone ? '' : 'hover:scale-105 cursor-pointer'}" 
-                                title="${isDone ? 'Selesai' : 'Klik ganti prioritas'}">
-                            ${escapeHTML(task.subject)}
+                        <button onclick="${isDone ? "" : `togglePriority('${task.id}')`}" 
+                                class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border ${style.badge} transition-all ${isDone ? "" : "hover:scale-105 cursor-pointer"}">
+                            ${task.subject}
                         </button>
                         <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-1">
                             <i class="fa-solid fa-trash-can text-sm"></i>
                         </button>
                     </div>
-                    
-                    <h4 class="font-semibold text-white leading-snug ${isDone ? 'line-through text-slate-500' : ''}">
-                        ${escapeHTML(task.title)}
-                    </h4>
-                    
+                    <h4 class="font-semibold text-white leading-snug ${isDone ? "line-through text-slate-500" : ""}">${task.title}</h4>
                     <div class="flex justify-between items-end mt-auto pt-2 border-t border-slate-700/50">
                         ${dateHtml}
                         <div class="ml-auto flex items-center gap-2">
-                            <span class="text-[10px] text-izer-muted font-medium uppercase tracking-wide">${isDone ? 'Selesai' : 'Tandai'}</span>
-                            <input type="checkbox" class="custom-checkbox" ${isDone ? 'checked' : ''} onchange="toggleComplete('${task.id}')">
+                            <span class="text-[10px] text-izer-muted font-medium uppercase tracking-wide">${isDone ? "Selesai" : "Tandai"}</span>
+                            <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onchange="toggleComplete('${task.id}')">
                         </div>
                     </div>
                 `;
 
-                card.addEventListener('dragstart', window.handleDragStart);
-                card.addEventListener('dragend', window.handleDragEnd);
-                if (columnEl) columnEl.appendChild(card);
-            });
-
-            // Update Counts
-            document.getElementById('stat-total').textContent = counts.total;
-            document.getElementById('stat-urgent').textContent = counts.urgent;
-            document.getElementById('stat-relaxed').textContent = counts.relaxed;
-            document.getElementById('stat-done').textContent = counts.completed;
-            document.getElementById('count-urgent').textContent = counts.urgent;
-            document.getElementById('count-relaxed').textContent = counts.relaxed;
-            document.getElementById('count-done').textContent = counts.completed;
-        }
-
-        window.handleDragStart = (e) => {
-            e.dataTransfer.setData('text/plain', e.currentTarget.dataset.id);
-            e.currentTarget.classList.add('dragging');
-        }
-        window.handleDragEnd = (e) => e.currentTarget.classList.remove('dragging');
-
-        columns.forEach(col => {
-            col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
-            col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-            col.addEventListener('drop', e => {
-                e.preventDefault();
-                col.classList.remove('drag-over');
-                const id = e.dataTransfer.getData('text/plain');
-                if(id) updateTaskStatus(id, col.dataset.status);
-            });
+          card.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", e.currentTarget.dataset.id);
+            e.currentTarget.classList.add("dragging");
+          });
+          card.addEventListener("dragend", (e) => e.currentTarget.classList.remove("dragging"));
+          if (columnEl) columnEl.appendChild(card);
         });
 
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        document.getElementById("stat-total").textContent = counts.total;
+        document.getElementById("stat-urgent").textContent = counts.urgent;
+        document.getElementById("stat-relaxed").textContent = counts.relaxed;
+        document.getElementById("stat-done").textContent = counts.completed;
+        document.getElementById("count-urgent").textContent = counts.urgent;
+        document.getElementById("count-relaxed").textContent = counts.relaxed;
+        document.getElementById("count-done").textContent = counts.completed;
+      }
+
+      // Drag & Drop event untuk kolom
+      document.querySelectorAll(".kanban-column").forEach((col) => {
+        col.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          col.classList.add("drag-over");
+        });
+        col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+        col.addEventListener("drop", (e) => {
+          e.preventDefault();
+          col.classList.remove("drag-over");
+          const id = e.dataTransfer.getData("text/plain");
+          if (id) updateTaskStatus(id, col.dataset.status);
+        });
+      });
+
+      function initCalendar() {
+        if (calendarInstance) {
+          calendarInstance.render();
+          return;
         }
+        const calendarEl = document.getElementById("calendar-el");
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+          initialView: "dayGridMonth",
+          locale: "id",
+          headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,dayGridWeek" },
+          height: "100%",
+          dateClick: function (info) {
+            openModal(info.dateStr);
+          },
+          eventClick: function (info) {
+            toggleComplete(info.event.id);
+          },
+        });
+        calendarInstance.render();
+        updateCalendarEvents();
+      }
 
-        function initCalendar() {
-            if (calendarInstance) {
-                calendarInstance.render();
-                return;
-            }
-            
-            const calendarEl = document.getElementById('calendar-el');
-            calendarInstance = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'id',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,dayGridWeek'
-                },
-                height: '100%',
-                dateClick: function(info) {
-                    // Fitur "Upload Sendiri" dengan mengklik tanggal
-                    openModal(info.dateStr); 
-                },
-                eventClick: function(info) {
-                    // Could show task details, for now just toggle completion
-                    toggleComplete(info.event.id);
-                }
-            });
-            calendarInstance.render();
-            updateCalendarEvents();
-        }
+      function updateCalendarEvents() {
+        if (!calendarInstance) return;
+        calendarInstance.removeAllEvents();
+        const events = tasks
+          .filter((t) => t.deadline)
+          .map((t) => {
+            let color = "#3b82f6";
+            if (t.completed) color = "#10b981";
+            else if (t.type === "urgent") color = "#f43f5e";
+            return { id: t.id, title: t.title, start: t.deadline, backgroundColor: color, borderColor: color, textColor: "#ffffff" };
+          });
+        calendarInstance.addEventSource(events);
+      }
 
-        function updateCalendarEvents() {
-            if (!calendarInstance) return;
-            
-            // Remove old events
-            calendarInstance.removeAllEvents();
-            
-            // Add new events
-            const events = tasks.filter(t => t.deadline).map(t => {
-                let color = '#3b82f6'; // relaxed
-                if (t.completed) color = '#10b981'; // done
-                else if (t.type === 'urgent') color = '#f43f5e'; // urgent
+      function renderCharts() {
+        Chart.defaults.color = "#94a3b8";
+        Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
 
-                return {
-                    id: t.id,
-                    title: t.title,
-                    start: t.deadline,
-                    backgroundColor: color,
-                    borderColor: color,
-                    textColor: '#ffffff'
-                };
-            });
-            
-            calendarInstance.addEventSource(events);
-        }
+        const doneCount = tasks.filter((t) => t.completed).length;
+        const pendingCount = tasks.length - doneCount;
+        const urgentCount = tasks.filter((t) => !t.completed && t.type === "urgent").length;
+        const relaxedCount = tasks.filter((t) => !t.completed && t.type === "relaxed").length;
 
-        function renderCharts() {
-            Chart.defaults.color = '#94a3b8';
-            Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
+        const ctxCompletion = document.getElementById("chart-completion").getContext("2d");
+        if (chartCompletion) chartCompletion.destroy();
+        chartCompletion = new Chart(ctxCompletion, {
+          type: "doughnut",
+          data: { labels: ["Selesai", "Belum Selesai"], datasets: [{ data: [doneCount, pendingCount], backgroundColor: ["#10b981", "#334155"], borderWidth: 0 }] },
+          options: { responsive: true, maintainAspectRatio: false, cutout: "75%", plugins: { legend: { position: "bottom" } } },
+        });
 
-            const doneCount = tasks.filter(t => t.completed).length;
-            const pendingCount = tasks.length - doneCount;
-            
-            const urgentCount = tasks.filter(t => !t.completed && t.type === 'urgent').length;
-            const relaxedCount = tasks.filter(t => !t.completed && t.type === 'relaxed').length;
-
-            // Chart 1: Completion (Doughnut)
-            const ctxCompletion = document.getElementById('chart-completion').getContext('2d');
-            if (chartCompletion) chartCompletion.destroy();
-            
-            if (tasks.length === 0) {
-                 // Empty state visualization logic could go here, but rendering an empty chart is fine
-            }
-
-            chartCompletion = new Chart(ctxCompletion, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Selesai', 'Belum Selesai'],
-                    datasets: [{
-                        data: [doneCount, pendingCount],
-                        backgroundColor: ['#10b981', '#334155'],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
-
-            // Chart 2: Priority (Bar)
-            const ctxPriority = document.getElementById('chart-priority').getContext('2d');
-            if (chartPriority) chartPriority.destroy();
-
-            chartPriority = new Chart(ctxPriority, {
-                type: 'bar',
-                data: {
-                    labels: ['Mendesak', 'Bisa Nanti'],
-                    datasets: [{
-                        label: 'Jumlah Tugas',
-                        data: [urgentCount, relaxedCount],
-                        backgroundColor: ['#f43f5e', '#3b82f6'],
-                        borderRadius: 6,
-                        barPercentage: 0.5
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
+        const ctxPriority = document.getElementById("chart-priority").getContext("2d");
+        if (chartPriority) chartPriority.destroy();
+        chartPriority = new Chart(ctxPriority, {
+          type: "bar",
+          data: { labels: ["Mendesak", "Bisa Nanti"], datasets: [{ label: "Jumlah Tugas", data: [urgentCount, relaxedCount], backgroundColor: ["#f43f5e", "#3b82f6"], borderRadius: 6 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } } },
+        });
+      }
     </script>
-</body>
+  </body>
 </html>
