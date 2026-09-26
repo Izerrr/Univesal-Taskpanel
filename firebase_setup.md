@@ -53,7 +53,7 @@ Kunci API Firebase lama (`AIzaSyCPWG...`) yang sempat tertera di `index.html` ha
 ### Langkah D: Revoke (Hapus) API Key Lama
 
 1. Kembali ke [Google Cloud Console - Credentials](https://console.cloud.google.com/apis/credentials).
-2. Temukan kunci API lama yang terdeteksi bocor (`AIzaSyCPWG39zMRRdnEETqkxbEnIpJlev244tnI`).
+2. Temukan kunci API lama yang terdeteksi bocor (`AIzaSy...[KUNCI_LAMA]`).
 3. Klik ikon tempat sampah (**Delete**) untuk mencabut/menghapus kunci tersebut secara permanen.
 
 ---
@@ -105,7 +105,7 @@ Jika Anda ingin menghapus commit berisiko dari seluruh histori commit git:
 ```bash
 # Menggunakan git filter-repo (rekomendasi resmi Git/GitHub)
 pip install git-filter-repo
-git filter-repo --replace-text <(echo "AIzaSyCPWG39zMRRdnEETqkxbEnIpJlev244tnI==>ROTATED_KEY_REMOVED")
+git filter-repo --replace-text <(echo "AIzaSy...LAMA==>ROTATED_KEY_REMOVED")
 git push origin --force --all
 ```
 
